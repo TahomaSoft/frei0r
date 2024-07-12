@@ -96,6 +96,11 @@ class euclid_eraser : public frei0r::mixer2
 public:
   euclid_eraser(unsigned int width, unsigned int height)
   {
+    f0r_param_double threshold;
+    register_param(threshold, "threshold", "Matching Threshold");
+    // Default distance threshold value
+    threshold = 5.0;
+
   }
 
    void update(double time,
@@ -103,10 +108,25 @@ public:
               const uint32_t* in1,
               const uint32_t* in2)
   {
+    // Destination File
     uint8_t *dst = reinterpret_cast<uint8_t*>(out);
-    const uint8_t *src1 = reinterpret_cast<const uint8_t*>(in1);
-    const uint8_t *src2 = reinterpret_cast<const uint8_t*>(in2);
 
+    // First source file (video track 0)
+    const uint8_t *src1 = reinterpret_cast<const uint8_t*>(in1);
+    
+    // Second source file (video track 1)
+    const uint8_t *src2 = reinterpret_cast<const uint8_t*>(in2);
+    
+    /* Note from MLT Framework Documentation:
+
+       "by default, the higher numbered track takes precedence over
+       the lower numbered track)."
+
+     https://www.mltframework.org/docs/framework/
+     
+    */
+
+    
     for (unsigned int i=0; i<size; ++i)
     {
       uint8_t red_src1   = src1[0];
@@ -134,3 +154,19 @@ frei0r::construct<euclid_eraser> plugin("euclid_eraser",
         "Erik H. Beck",
         0,2,
         F0R_COLOR_MODEL_RGBA8888);
+
+double euclidDistance(int x_r, int x_g, int x_b,  int y_r, int y_g, int y_b)
+   {
+   //calculating color channel differences for next steps
+   double red_d = x_r - y_r;
+   double green_d = x_g - y_g;
+   double blue_d = x_b - y_b; 
+  
+   double sq_sum, dist;
+
+   //calculating Euclidean distance
+   sq_sum = pow(red_d, 2) + pow(green_d, 2) + pow (blue_d, 2);
+   dist = sqrt(sq_sum);                  
+  
+   return dist;
+   }
