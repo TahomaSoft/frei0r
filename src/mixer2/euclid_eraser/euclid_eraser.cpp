@@ -81,6 +81,7 @@
 */
 
 
+#include<iostream>
 
 
 #include <math.h>
@@ -89,6 +90,24 @@
 
 #define NBYTES 4
 #define ALPHA 3
+
+double euclidDistance(uint8_t x_r, uint8_t x_g, uint8_t x_b,
+		      uint8_t y_r, uint8_t y_g, uint8_t y_b)
+   {
+   //calculating color channel differences for next steps
+   double red_d = x_r - y_r;
+   double green_d = x_g - y_g;
+   double blue_d = x_b - y_b; 
+  
+   double sq_sum, dist;
+
+   //calculating Euclidean distance
+   sq_sum = pow(red_d, 2) + pow(green_d, 2) + pow (blue_d, 2);
+   dist = sqrt(sq_sum);                  
+  
+   return dist;
+   }
+
 
 class euclid_eraser : public frei0r::mixer2
 {
@@ -103,12 +122,15 @@ public:
 
   }
 
-   void update(double time,
+  void update(double time,
               uint32_t* out,
               const uint32_t* in1,
               const uint32_t* in2)
   {
     // Destination File
+    // dst[0] to dst[3] is rgb
+    // dst[4] is alpha channel
+    
     uint8_t *dst = reinterpret_cast<uint8_t*>(out);
 
     // First source file (video track 0)
@@ -126,27 +148,50 @@ public:
      
     */
 
+    double e_dist;
     
     for (unsigned int i=0; i<size; ++i)
-    {
-      uint8_t red_src1   = src1[0];
-      uint8_t blue_src1  = src1[1];
-      uint8_t green_src1 = src1[2];
+      {
+	uint8_t red_src1    = src1[0];
+	uint8_t green_src1  = src1[1];
+	uint8_t blue_src1   = src1[2];
+	
+	uint8_t red_src2    = src2[0];
+	uint8_t green_src2  = src2[1];
+	uint8_t blue_src2   = src2[2];
 
-      uint8_t red_src2   = src2[0];
-      uint8_t blue_src2  = src2[1];
-      uint8_t green_src2 = src2[2];
+	// Loop over rgb
+	// Copy pixels from src2 to destination
 
-      for (int b=0; b<3; ++b)
-	{
-	  dst[b]=src2[b];
+	std::cout << "Threshold is: " << threshold;
+	  
+	for (int b=0; b<3; ++b)
+	  {
+	    dst[b]=src2[b];
+	  }
+
+	
+	e_dist=euclidDistance(red_src1, green_src1, blue_src1,
+			      red_src2, green_src2, blue_src2);
+
+       
+	if (e_dist <=  euclid_eraser::threshold) {
+	    // Make alpha channel for pixel fully transparent
+	    dst[4]=0;
+	  }
+	else {
+	  // Make alpha channel for the pixel fully opaque
+	  dst[4]=255;
 	}
-      
-    }
-    
+	
+      }
   }
 
+private:
+  double threshold;
+  
 };
+
 
 
 frei0r::construct<euclid_eraser> plugin("euclid_eraser",
@@ -155,18 +200,3 @@ frei0r::construct<euclid_eraser> plugin("euclid_eraser",
         0,2,
         F0R_COLOR_MODEL_RGBA8888);
 
-double euclidDistance(int x_r, int x_g, int x_b,  int y_r, int y_g, int y_b)
-   {
-   //calculating color channel differences for next steps
-   double red_d = x_r - y_r;
-   double green_d = x_g - y_g;
-   double blue_d = x_b - y_b; 
-  
-   double sq_sum, dist;
-
-   //calculating Euclidean distance
-   sq_sum = pow(red_d, 2) + pow(green_d, 2) + pow (blue_d, 2);
-   dist = sqrt(sq_sum);                  
-  
-   return dist;
-   }
