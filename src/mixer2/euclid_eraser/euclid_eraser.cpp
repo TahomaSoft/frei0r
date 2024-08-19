@@ -111,21 +111,27 @@ double euclidDistance(uint8_t x_r, uint8_t x_g, uint8_t x_b,
 
 class euclid_eraser : public frei0r::mixer2
 {
+  ofstream loggingFile;
+private:
+  double threshold;
   
 public:
   euclid_eraser(unsigned int width, unsigned int height)
   {
-    f0r_param_double threshold;
+    threshold = 5.6;      // Default distance threshold value
     register_param(threshold, "threshold", "Matching Threshold");
-    // Default distance threshold value
-    // threshold = 5.0;
-    ofstream loggingFile;
+
+   
     loggingFile.open("/home/erikbeck/euclidlog.txt");
     loggingFile << "Threshold is: " << threshold;
     loggingFile << endl;
-    loggingFile.close();
+   
   }
-
+  ~euclid_eraser()
+  {
+    loggingFile.close(); 
+  }
+  
   void update(double time,
               uint32_t* out,
               const uint32_t* in1,
@@ -134,7 +140,8 @@ public:
     // Destination File
     // dst[0] to dst[3] is rgb
     // dst[4] is alpha channel
-    
+    loggingFile << "Threshold is: " << threshold;
+    loggingFile << endl;
     uint8_t *dst = reinterpret_cast<uint8_t*>(out);
 
     // First source file (video track 0)
@@ -179,7 +186,8 @@ public:
 	e_dist=euclidDistance(red_src1, green_src1, blue_src1,
 			      red_src2, green_src2, blue_src2);
 
-       
+        loggingFile << "Euclid Distance is: " << e_dist;
+	loggingFile << endl;
 	if (e_dist <=  euclid_eraser::threshold) {
 	    // Make alpha channel for pixel fully transparent
 	    dst[4]=0;
@@ -193,16 +201,13 @@ public:
     
   }
 
-private:
-  double threshold;
   
 };
-
 
 
 frei0r::construct<euclid_eraser> plugin("euclid_eraser",
 	"Erasing backgrounds with euclidian distance",
         "Erik H. Beck",
-        0,2,
+        0,1,
         F0R_COLOR_MODEL_RGBA8888);
 
