@@ -80,13 +80,13 @@
 
 */
 
-
 #include<iostream>
-
+#include <fstream>
+using namespace std;
 
 #include <math.h>
 #include "frei0r.hpp"
-#include "frei0r_math.h"
+#include "frei0r/math.h"
 
 #define NBYTES 4
 #define ALPHA 3
@@ -149,7 +149,9 @@ public:
     */
 
     double e_dist;
-    
+
+    ofstream loggingFile;
+    loggingFile.open("/home/erikbeck/euclidlog.txt");
     for (unsigned int i=0; i<size; ++i)
       {
 	uint8_t red_src1    = src1[0];
@@ -163,7 +165,7 @@ public:
 	// Loop over rgb
 	// Copy pixels from src2 to destination
 
-	std::cout << "Threshold is: " << threshold;
+	loggingFile << "Threshold is: " << threshold;
 	  
 	for (int b=0; b<3; ++b)
 	  {
@@ -185,6 +187,7 @@ public:
 	}
 	
       }
+    loggingFile.close();
   }
 
 private:
