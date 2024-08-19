@@ -118,8 +118,12 @@ public:
     f0r_param_double threshold;
     register_param(threshold, "threshold", "Matching Threshold");
     // Default distance threshold value
-    threshold = 5.0;
-
+    // threshold = 5.0;
+    ofstream loggingFile;
+    loggingFile.open("/home/erikbeck/euclidlog.txt");
+    loggingFile << "Threshold is: " << threshold;
+    loggingFile << endl;
+    loggingFile.close();
   }
 
   void update(double time,
@@ -150,8 +154,7 @@ public:
 
     double e_dist;
 
-    ofstream loggingFile;
-    loggingFile.open("/home/erikbeck/euclidlog.txt");
+    
     for (unsigned int i=0; i<size; ++i)
       {
 	uint8_t red_src1    = src1[0];
@@ -165,7 +168,7 @@ public:
 	// Loop over rgb
 	// Copy pixels from src2 to destination
 
-	loggingFile << "Threshold is: " << threshold;
+	
 	  
 	for (int b=0; b<3; ++b)
 	  {
@@ -187,7 +190,7 @@ public:
 	}
 	
       }
-    loggingFile.close();
+    
   }
 
 private:
