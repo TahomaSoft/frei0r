@@ -186,8 +186,8 @@ public:
 	e_dist=euclidDistance(red_src1, green_src1, blue_src1,
 			      red_src2, green_src2, blue_src2);
 
-        loggingFile << "Euclid Distance is: " << e_dist;
-	loggingFile << endl;
+        // loggingFile << "Euclid Distance is: " << e_dist;
+	// loggingFile << endl;
 	if (e_dist <=  euclid_eraser::threshold) {
 	    // Make alpha channel for pixel fully transparent
 	    dst[4]=0;
