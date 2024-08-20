@@ -111,7 +111,7 @@ double euclidDistance(uint8_t x_r, uint8_t x_g, uint8_t x_b,
 
 class euclid_eraser : public frei0r::mixer2
 {
-  ofstream loggingFile;
+  //  ofstream loggingFile;
 private:
   double threshold;
   
@@ -121,14 +121,14 @@ public:
     threshold = 5.6;      // Default distance threshold value
     register_param(threshold, "threshold", "Matching Threshold");
   
-    loggingFile.open("/home/erikbeck/euclidlog.txt");
-    loggingFile << "Threshold is: " << threshold;
-    loggingFile << endl;
+    // loggingFile.open("/home/erikbeck/euclidlog.txt");
+    // loggingFile << "Threshold is: " << threshold;
+    // loggingFile << endl;
    
   }
   ~euclid_eraser()
   {
-    loggingFile.close(); 
+    // loggingFile.close(); 
   }
   
   void update(double time,
@@ -139,8 +139,8 @@ public:
     // Destination File
     // dst[0] to dst[3] is rgb
     // dst[4] is alpha channel
-    loggingFile << "Threshold is: " << threshold;
-    loggingFile << endl;
+    // loggingFile << "Threshold is: " << threshold;
+    // loggingFile << endl;
     
 
     const uint8_t *src1 = reinterpret_cast<const uint8_t*>(in1); //frst track (0)
