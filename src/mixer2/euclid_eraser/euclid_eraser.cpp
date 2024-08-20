@@ -24,7 +24,7 @@
  */
 
 
-/* This class is intended to operate as a mixer, taking two inputs and
+/** This class is intended to operate as a mixer, taking two inputs and
    yielding one output.
 
    The first input is a reference input, such as a single image or a
@@ -80,9 +80,6 @@
 
 */
 
-#include<iostream>
-#include <fstream>
-using namespace std;
 
 #include <math.h>
 #include "frei0r.hpp"
@@ -111,24 +108,15 @@ double euclidDistance(uint8_t x_r, uint8_t x_g, uint8_t x_b,
 
 class euclid_eraser : public frei0r::mixer2
 {
-  //  ofstream loggingFile;
-private:
-  double threshold;
+  
+
   
 public:
   euclid_eraser(unsigned int width, unsigned int height)
   {
     threshold = 5.6;      // Default distance threshold value
     register_param(threshold, "threshold", "Matching Threshold");
-  
-    // loggingFile.open("/home/erikbeck/euclidlog.txt");
-    // loggingFile << "Threshold is: " << threshold;
-    // loggingFile << endl;
    
-  }
-  ~euclid_eraser()
-  {
-    // loggingFile.close(); 
   }
   
   void update(double time,
@@ -136,12 +124,7 @@ public:
               const uint32_t* in1,
               const uint32_t* in2)
   {
-    // Destination File
-    // dst[0] to dst[3] is rgb
-    // dst[4] is alpha channel
-    // loggingFile << "Threshold is: " << threshold;
-    // loggingFile << endl;
-    
+       
 
     const uint8_t *src1 = reinterpret_cast<const uint8_t*>(in1); //frst track (0)
     const uint8_t *src2 = reinterpret_cast<const uint8_t*>(in2); //second trk (1)
@@ -179,9 +162,7 @@ public:
 	  }
 	e_dist=euclidDistance(src1[0],src1[1],src1[2],
 			      src2[0],src2[1],src2[2]);
-
-        // loggingFile << "Euclid Distance is: " << e_dist;
-	// loggingFile << endl;
+	
 	if (e_dist <=  euclid_eraser::threshold) {
 	    // Make alpha channel for pixel fully transparent
 	    dst[3]=0;
@@ -197,10 +178,10 @@ public:
       }
     
   }
+private:
+  double threshold;
 
-  
 };
-
 
 frei0r::construct<euclid_eraser> plugin("euclid_eraser",
 	"Erasing backgrounds with euclidian distance",
