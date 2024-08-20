@@ -141,51 +141,44 @@ public:
     // dst[4] is alpha channel
     loggingFile << "Threshold is: " << threshold;
     loggingFile << endl;
-    uint8_t *dst = reinterpret_cast<uint8_t*>(out);
+    
 
     const uint8_t *src1 = reinterpret_cast<const uint8_t*>(in1); //frst track (0)
     const uint8_t *src2 = reinterpret_cast<const uint8_t*>(in2); //second trk (1)
-    
-    /* Note from MLT Framework Documentation:
-
-       "by default, the higher numbered track takes precedence over
-       the lower numbered track)."
-
-     https://www.mltframework.org/docs/framework/
-     
-    */
-
+    uint8_t *dst = reinterpret_cast<uint8_t*>(out);
+        
     double e_dist;
 
     uint32_t sizeCounter = size;
     uint8_t red_src1, green_src1, blue_src1;
     uint8_t red_src2, green_src2, blue_src2;
+    uint32_t b;
+
+    /*
+      red_src1    = src1[0];
+      green_src1  = src1[1];
+      blue_src1   = src1[2];
+      alpha_src1 = src1[3]
+      
+      red_src2    = src2[0];
+      green_src2  = src2[1];
+      blue_src2   = src2[2];
+      alpha_src2 = src2[3]
+    */
+    
     
     while (sizeCounter--)
       {
-	red_src1    = src1[0];
-	green_src1  = src1[1];
-	blue_src1   = src1[2];
-	// alpha_src1 = src1[3]
-	
-	red_src2    = src2[0];
-	green_src2  = src2[1];
-	blue_src2   = src2[2];
-	// alpha_src2 = src2[3]
-	
+
 	// Loop over rgb
 	// Copy pixels from src2 to destination
-
-	uint32_t b;
 	  
 	for (b=0; b<3; b++)
 	  {
 	    dst[b]=src2[b];
 	  }
-
-	
-	e_dist=euclidDistance(red_src1, green_src1, blue_src1,
-			      red_src2, green_src2, blue_src2);
+	e_dist=euclidDistance(src1[0],src1[1],src1[2],
+			      src2[0],src2[1],src2[2]);
 
         // loggingFile << "Euclid Distance is: " << e_dist;
 	// loggingFile << endl;
@@ -198,6 +191,9 @@ public:
 	  dst[3]=255;
 	}
 	
+	src1 += NBYTES;
+	src2 += NBYTES;
+	dst += NBYTES;
       }
     
   }
