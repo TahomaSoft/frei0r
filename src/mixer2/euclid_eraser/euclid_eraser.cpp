@@ -23,63 +23,10 @@
  *
  */
 
-
-/** This class is intended to operate as a mixer, taking two inputs and
-   yielding one output.
-
-   The first input is a reference input, such as a single image or a
-   stretched video of a single image.
-
-   The second input is the video stream to operate on.
-
-   The output is a clone of the RGB data of the second input, but with
-   the alpha channel modified.
-
-   This mixer takes the (first) reference input, such as a static background,
-   and removes it from every frame in the video stream of the second
-   input.
-
-   The alpha channel on the output is based on the euclidian distance
-   of the two input coordinates in 3-d RGB space. If the calculated
-   distance betwen the two inputs for a given pixel is less than a
-   provided (variable) threshold amount, that indicates the pixel in
-   the background (reference) image is the same or similar enough to
-   the operational (second) input that is part of the background to be
-   removed, and the transparency is set to fully transparent via the
-   alpha channel (set to 0).
-
-   If the calcuated distance exceeds the threshold, then that pixel is
-   part of the foreground image to be retained, and the transparency
-   of it is set to be fully opaque (alpha channel for that pixel set
-   to 255).
-
-   The basic comparison algorithm is:
-
-   ****
-   // x is reference image
-   // y is comparison image to remove reference from
-
-
-   float euclidDistance(int x_r, int x_g, int x_b,  int y_r, int y_g, int y_b)
-   {
-   //calculating color channel differences for next steps
-   float red_d = x_r - y_r;
-   float green_d = x_g - y_g;
-   float blue_d = x_b - y_b; 
-  
-   float sq_sum, dist;
-
-   //calculating Euclidean distance
-   sq_sum = pow(red_d, 2) + pow(green_d, 2) + pow (blue_d)
-   dist = sqrt(sq_sum);                  
-  
-   return dist;
-   }
-   *****
-
-
+/** This is the source file for the euclid eraser two-input mixer for
+    frei0r. It uses euclidean distance to remove a static background
+    from a video. See file ./euclid_eraser.md for more info
 */
-
 
 #include <math.h>
 #include "frei0r.hpp"
@@ -109,14 +56,11 @@ double euclidDistance(uint8_t x_r, uint8_t x_g, uint8_t x_b,
 class euclid_eraser : public frei0r::mixer2
 {
   
-
-  
 public:
   euclid_eraser(unsigned int width, unsigned int height)
   {
     threshold = 5.6;      // Default distance threshold value
     register_param(threshold, "threshold", "Matching Threshold");
-   
   }
   
   void update(double time,
@@ -125,7 +69,6 @@ public:
               const uint32_t* in2)
   {
        
-
     const uint8_t *src1 = reinterpret_cast<const uint8_t*>(in1); //frst track (0)
     const uint8_t *src2 = reinterpret_cast<const uint8_t*>(in2); //second trk (1)
     uint8_t *dst = reinterpret_cast<uint8_t*>(out);
@@ -133,23 +76,8 @@ public:
     double e_dist;
 
     uint32_t sizeCounter = size;
-    uint8_t red_src1, green_src1, blue_src1;
-    uint8_t red_src2, green_src2, blue_src2;
     uint32_t b;
-
-    /*
-      red_src1    = src1[0];
-      green_src1  = src1[1];
-      blue_src1   = src1[2];
-      alpha_src1 = src1[3]
-      
-      red_src2    = src2[0];
-      green_src2  = src2[1];
-      blue_src2   = src2[2];
-      alpha_src2 = src2[3]
-    */
-    
-    
+ 
     while (sizeCounter--)
       {
 
@@ -174,7 +102,7 @@ public:
 	
 	src1 += NBYTES;
 	src2 += NBYTES;
-	dst += NBYTES;
+	dst  += NBYTES;
       }
     
   }
